@@ -1,0 +1,5 @@
+.DS_Store
+.remember/
+.claude/
+node_modules/
+.preview-*.png

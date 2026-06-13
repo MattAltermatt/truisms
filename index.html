@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Truisms — TRMNL plugin preview</title>
+  <link rel="stylesheet" href="https://trmnl.com/css/latest/plugins.css">
+  <style>
+    body {
+      margin: 0; min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 24px; padding: 40px 20px; background: #f3f4f6;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #1f2937;
+    }
+    .device {
+      width: 400px; height: 240px; background: white;
+      border-radius: 12px; overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.08);
+    }
+    .quad {
+      width: 100%; height: 100%; box-sizing: border-box;
+      padding: 18px 20px 10px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    #hero {
+      flex: 1 1 auto; display: flex; align-items: center; justify-content: center;
+      text-align: center; font-weight: 800; line-height: 1.08;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      overflow: hidden;
+    }
+    #credit {
+      flex: 0 0 auto; font-size: 10px; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #111; opacity: 0.7;
+      padding-top: 8px; border-top: 1px solid rgba(0,0,0,0.25);
+      width: 100%; text-align: center;
+    }
+    .controls { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+    button {
+      padding: 8px 16px; border: 1px solid #d1d5db; background: white;
+      border-radius: 6px; cursor: pointer; font-size: 14px; font-family: inherit;
+    }
+    button:hover { background: #f9fafb; }
+    #counter { min-width: 70px; text-align: center; font-variant-numeric: tabular-nums; }
+    .footer { font-size: 12px; color: #6b7280; }
+    .footer a { color: #6b7280; }
+  </style>
+</head>
+<body>
+  <div class="device trmnl">
+    <div class="view view--quadrant">
+      <div class="quad">
+        <div id="hero">…</div>
+        <div id="credit">Jenny Holzer · Truisms, 1984</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button onclick="prev()">← prev</button>
+    <span id="counter">0 / 0</span>
+    <button onclick="next()">next →</button>
+    <button onclick="shuffle()">shuffle</button>
+    <button onclick="live()">live</button>
+  </div>
+
+  <div class="footer">
+    Live preview of the current truism.
+    <a href="https://github.com/MattAltermatt/truisms" target="_blank">View source ↗</a>
+  </div>
+
+  <script type="module">
+    import { pickIndex, fontSizePx } from './lib/picker.js';
+
+    let items = [];
+    let cursor = 0;
+
+    function nowSeconds() { return Math.floor(Date.now() / 1000); }
+    function liveIndex() { return pickIndex(nowSeconds(), items.length); }
+
+    function render() {
+      const text = items[cursor];
+      const hero = document.getElementById('hero');
+      hero.style.fontSize = fontSizePx(text) + 'px';
+      hero.textContent = text;
+      document.getElementById('counter').textContent = `${cursor + 1} / ${items.length}`;
+    }
+
+    window.prev = () => { if (items.length) { cursor = (cursor - 1 + items.length) % items.length; render(); } };
+    window.next = () => { if (items.length) { cursor = (cursor + 1) % items.length; render(); } };
+    window.shuffle = () => { if (items.length) { cursor = Math.floor(Math.random() * items.length); render(); } };
+    window.live = () => { if (items.length) { cursor = liveIndex(); render(); } };
+
+    fetch('./truisms.json')
+      .then((r) => r.json())
+      .then((data) => { items = data.items; cursor = liveIndex(); render(); })
+      .catch((err) => { document.getElementById('hero').textContent = 'Failed to load.'; console.error(err); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,26 @@
+{%- comment -%}
+  Truisms — TRMNL quadrant (400×240).
+  Picker mirrors lib/picker.js: idx = (epoch_seconds * 97) % items.size.
+  97 is prime and coprime to 132 → bijective shuffle, never freezes.
+  Font size buckets by total length (same thresholds as fontSizePx).
+{%- endcomment -%}
+{%- assign s = 'now' | date: '%s' | plus: 0 -%}
+{%- assign idx = s | times: 97 | modulo: items.size -%}
+{%- assign current = items[idx] -%}
+
+{%- assign n = current | size -%}
+{%- if n <= 25    -%}{%- assign fs = 46 -%}
+{%- elsif n <= 40 -%}{%- assign fs = 36 -%}
+{%- elsif n <= 55 -%}{%- assign fs = 29 -%}
+{%- else          -%}{%- assign fs = 24 -%}{%- endif -%}
+
+<div class="view view--quadrant">
+  <div class="layout layout--col" style="height:100%;box-sizing:border-box;padding:18px 20px 10px;">
+    <div class="layout layout--col layout--center" style="flex:1 1 auto;overflow:hidden;">
+      <span class="value text--center"
+            style="font-size:{{ fs }}px;font-weight:800;line-height:1.08;text-transform:uppercase;letter-spacing:0.5px;">{{ current | escape }}</span>
+    </div>
+    <div class="text--center"
+         style="flex:0 0 auto;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;opacity:0.7;padding-top:8px;border-top:1px solid rgba(0,0,0,0.25);">JENNY HOLZER &middot; TRUISMS, 1984</div>
+  </div>
+</div>
